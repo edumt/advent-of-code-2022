@@ -1,5 +1,6 @@
 import { resolve } from "path";
 
+// should be global util
 export const extractData = async (filePath: string): Promise<string> => {
   const file = Bun.file(resolve(import.meta.dir, filePath));
   const data = await file.text();
@@ -12,6 +13,7 @@ export enum OpponentShape {
   Paper = "B",
   Scissors = "C",
 }
+
 export enum ResponseShape {
   Rock = "X",
   Paper = "Y",
@@ -51,3 +53,36 @@ export const getOutcomeScore = (
   shape: OpponentShape,
   response: ResponseShape
 ) => responseScore[shape][response];
+
+// part2
+
+export enum Outcome {
+  Lose = "X",
+  Draw = "Y",
+  Win = "Z",
+}
+
+const responseByOutcome: Record<
+  OpponentShape,
+  Record<Outcome, ResponseShape>
+> = {
+  [OpponentShape.Rock]: {
+    [Outcome.Lose]: ResponseShape.Scissors,
+    [Outcome.Draw]: ResponseShape.Rock,
+    [Outcome.Win]: ResponseShape.Paper,
+  },
+  [OpponentShape.Paper]: {
+    [Outcome.Lose]: ResponseShape.Rock,
+    [Outcome.Draw]: ResponseShape.Paper,
+    [Outcome.Win]: ResponseShape.Scissors,
+  },
+  [OpponentShape.Scissors]: {
+    [Outcome.Lose]: ResponseShape.Paper,
+    [Outcome.Draw]: ResponseShape.Scissors,
+    [Outcome.Win]: ResponseShape.Rock,
+  },
+} as const;
+
+export const getResponse = (shape: OpponentShape, outcome: Outcome) => {
+  return responseByOutcome[shape][outcome];
+};
